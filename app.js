@@ -1,6 +1,6 @@
 const express = require('express');
-
-const app = express();
+const bodyParser = require('body-parser');
+const e = require('express');
 
 let persons = [
   {
@@ -25,8 +25,33 @@ let persons = [
   },
 ];
 
+const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.get('/api/persons', (req, res) => {
   res.json(persons);
+});
+
+app.post('/api/persons', (req, res) => {
+  if (!req.body.name) {
+    res.status(400).json({ error: 'name required' });
+  } else if (!req.body.number) {
+    res.status(400).json({ error: 'number required' });
+  } else {
+    const exists = persons.find((person) => req.body.name === person.name);
+    if (exists) {
+      res.status(400).json({ error: 'name must be unique' });
+    } else {
+      const id = Math.floor(Math.random() * 100);
+      req.body = {
+        id,
+        ...req.body,
+      };
+      persons.push(req.body);
+      console.log(persons);
+      res.end();
+    }
+  }
 });
 
 app.get('/api/persons/:id', (req, res) => {
