@@ -29,6 +29,12 @@ app.get('/api/persons', (req, res) => {
   res.json(persons);
 });
 
+app.get('/api/persons/:id', (req, res) => {
+  const person = persons.find((person) => person.id === Number(req.params.id));
+  if (person) res.json(person);
+  else res.send('<p>person not found</p>');
+});
+
 app.get('/info', (req, res) => {
   res.write(`<p>Phonebook has info for ${persons.length} people</p>`);
   res.write(`<p>${new Date()}</p>`);
