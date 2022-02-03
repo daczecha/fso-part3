@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/daczecha/fso-part3#readme",
   "dependencies": {
-    "express": "^4.17.2",
-    "nodemon": "^2.0.15"
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
   }
 }
