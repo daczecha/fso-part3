@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const e = require('express');
+const morgan = require('morgan');
 
 let persons = [
   {
@@ -27,6 +27,7 @@ let persons = [
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(morgan('tiny'));
 
 app.get('/api/persons', (req, res) => {
   res.json(persons);
