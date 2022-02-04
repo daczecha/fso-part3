@@ -26,8 +26,15 @@ let persons = [
 ];
 
 const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(morgan('tiny'));
+app.use(bodyParser.json());
+
+morgan.token('body', function (req, res) {
+  if (req.method === 'POST') {
+    return JSON.stringify(req.body);
+  } else return '';
+});
+
+app.use(morgan(':method :url :status :response-time ms :body'));
 
 app.get('/api/persons', (req, res) => {
   res.json(persons);
@@ -49,7 +56,6 @@ app.post('/api/persons', (req, res) => {
         ...req.body,
       };
       persons.push(req.body);
-      console.log(persons);
       res.end();
     }
   }
