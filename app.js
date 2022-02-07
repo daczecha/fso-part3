@@ -48,18 +48,39 @@ app.get('/api/persons/:id', (req, res) => {
   if (person) res.json(person);
   else res.send('<p>person not found</p>');
 });
-
-app.delete('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id);
-  persons = persons.filter((person) => person.id !== id);
-  res.status(204).end();
+*/
+app.delete('/api/persons/:id', (req, res, next) => {
+  const id = req.params.id;
+  Number.findByIdAndDelete(id)
+    .then((result) => res.status(204).end())
+    .catch((error) => next(error));
 });
 
+/*
 app.get('/info', (req, res) => {
   res.write(`<p>Phonebook has info for ${persons.length} people</p>`);
   res.write(`<p>${new Date()}</p>`);
   res.end();
 });
 */
+
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({ error: 'unknown endpoint' });
+};
+
+app.use(unknownEndpoint);
+
+const errorHandler = (error, req, res, next) => {
+  console.error(error.message);
+
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log('Server started on localhost:3001'));
