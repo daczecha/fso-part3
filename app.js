@@ -26,27 +26,21 @@ app.get('/api/persons', (req, res) => {
     res.json(result);
   });
 });
-/*
+
 app.post('/api/persons', (req, res) => {
-  if (!req.body.name) {
-    res.status(400).json({ error: 'name required' });
-  } else if (!req.body.number) {
-    res.status(400).json({ error: 'number required' });
-  } else {
-    const exists = persons.find((person) => req.body.name === person.name);
-    if (exists) {
-      res.status(400).json({ error: 'name must be unique' });
-    } else {
-      const id = Math.floor(Math.random() * 100);
-      req.body = {
-        id,
-        ...req.body,
-      };
-      persons.push(req.body);
-      res.end();
-    }
+  if (req.body.name === undefined || req.body.number === undefined) {
+    return res.status(400).json({ error: 'content missing' });
   }
+
+  const number = new Number({
+    name: req.body.name,
+    number: req.body.number,
+  });
+
+  number.save().then((savedNumber) => res.json(savedNumber));
 });
+
+/*
 
 app.get('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id);
