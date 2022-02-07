@@ -21,13 +21,15 @@ morgan.token('body', function (req, res) {
 
 app.use(morgan(':method :url :status :response-time ms :body'));
 
-app.get('/api/persons', (req, res) => {
-  Number.find({}).then((result) => {
-    res.json(result);
-  });
+app.get('/api/persons', (req, res, next) => {
+  Number.find({})
+    .then((result) => {
+      res.json(result);
+    })
+    .catch((error) => next(error));
 });
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   if (req.body.name === undefined || req.body.number === undefined) {
     return res.status(400).json({ error: 'content missing' });
   }
@@ -37,18 +39,21 @@ app.post('/api/persons', (req, res) => {
     number: req.body.number,
   });
 
-  number.save().then((savedNumber) => res.json(savedNumber));
+  number
+    .save()
+    .then((savedNumber) => res.json(savedNumber))
+    .catch((error) => next(error));
 });
 
-/*
-
-app.get('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find((person) => person.id === id);
-  if (person) res.json(person);
-  else res.send('<p>person not found</p>');
+app.get('/api/persons/:id', (req, res, next) => {
+  const id = req.params.id;
+  Number.findById(id)
+    .then((result) => {
+      if (result) res.json(result);
+      else res.status(404).end();
+    })
+    .catch((error) => next(error));
 });
-*/
 
 app.delete('/api/persons/:id', (req, res, next) => {
   const id = req.params.id;
@@ -70,13 +75,14 @@ app.put('/api/persons/:id', (req, res, next) => {
     .catch((error) => next(error));
 });
 
-/*
-app.get('/info', (req, res) => {
-  res.write(`<p>Phonebook has info for ${persons.length} people</p>`);
-  res.write(`<p>${new Date()}</p>`);
-  res.end();
+app.get('/info', (req, res, next) => {
+  Number.countDocuments({}, function (err, count) {
+    console.log(count);
+    res.write(`<p>Phonebook has info for ${count} people</p>`);
+    res.write(`<p>${new Date()}</p>`);
+    res.end();
+  }).catch((error) => next(error));
 });
-*/
 
 const unknownEndpoint = (req, res) => {
   res.status(404).send({ error: 'unknown endpoint' });
