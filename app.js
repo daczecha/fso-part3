@@ -49,10 +49,24 @@ app.get('/api/persons/:id', (req, res) => {
   else res.send('<p>person not found</p>');
 });
 */
+
 app.delete('/api/persons/:id', (req, res, next) => {
   const id = req.params.id;
   Number.findByIdAndDelete(id)
     .then((result) => res.status(204).end())
+    .catch((error) => next(error));
+});
+
+app.put('/api/persons/:id', (req, res, next) => {
+  const id = req.params.id;
+
+  const number = {
+    name: req.body.name,
+    number: req.body.number,
+  };
+
+  Number.findByIdAndUpdate(id, number, { new: true })
+    .then((updatedNumber) => res.json(updatedNumber))
     .catch((error) => next(error));
 });
 
