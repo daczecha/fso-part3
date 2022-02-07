@@ -13,6 +13,17 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('build'));
 
+const errorHandler = (error, req, res, next) => {
+  console.error(error.message);
+
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' });
+  } else if (error.name === 'ValidationError') {
+    return res.status(400).json({ error: error.message });
+  }
+  next(error);
+};
+
 morgan.token('body', function (req, res) {
   if (req.method === 'POST') {
     return JSON.stringify(req.body);
@@ -70,7 +81,7 @@ app.put('/api/persons/:id', (req, res, next) => {
     number: req.body.number,
   };
 
-  Number.findByIdAndUpdate(id, number, { new: true })
+  Number.findByIdAndUpdate(id, number, { new: true, runValidators: true })
     .then((updatedNumber) => res.json(updatedNumber))
     .catch((error) => next(error));
 });
@@ -89,16 +100,6 @@ const unknownEndpoint = (req, res) => {
 };
 
 app.use(unknownEndpoint);
-
-const errorHandler = (error, req, res, next) => {
-  console.error(error.message);
-
-  if (error.name === 'CastError') {
-    return res.status(400).send({ error: 'malformatted id' });
-  }
-
-  next(error);
-};
 
 app.use(errorHandler);
 
